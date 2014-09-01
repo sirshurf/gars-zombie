@@ -90,7 +90,7 @@ fi
 
 CONFIG=$(cd $(dirname $CONFIG); pwd)/$(basename $CONFIG)
 
-if [ -f "$CONFIG" ]; then 
+if [ ! -f "$CONFIG" ]; then 
     usage
 fi
 

@@ -96,4 +96,4 @@ fi
 
 mydir=`dirname $0`
 PATH=$PATH:$mydir/../node_modules/.bin:
-echo $mydir/../node_modules/.bin/forever start -l $FOREVER -o $OUTPUT -e $ERROR $mydir/../index.js $CONFIG
+$mydir/../node_modules/.bin/forever start -l $FOREVER -o $OUTPUT -e $ERROR $mydir/../index.js $CONFIG
