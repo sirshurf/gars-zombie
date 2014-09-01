@@ -13,7 +13,7 @@
   },
   "devDependencies": {},
   "bin": {
-    "gars": "./bin/gars-zombie"
+    "gars": "./bin/gars"
   },
   "keywords": [
     "google",
