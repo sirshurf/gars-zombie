@@ -1,10 +1,9 @@
 #!/bin/bash
-OUTPUT="/var/log/gars/forever.log"
-FOREVER="/var/log/gars/out.log"
-ERROR="/var/log/gars/err.log"
+
+FOREVERPATH="./var"
 
 
-usage() { echo "Usage: $0 [-c <string>] [-l </var/log/gars/forever.log>] [-o </var/log/gars/out.log>] [-e </var/log/gars/err.log>]" 1>&2; exit 1; }
+usage() { echo "Usage: $0 [-c <string>] [-p <./var>] " 1>&2; exit 1; }
 
 while test $# -gt 0; do
         case "$1" in
@@ -33,10 +32,10 @@ while test $# -gt 0; do
                         export CONFIG=`echo $1 | sed -e 's/^[^=]*=//g'`
                         shift
                         ;;
-                -l)
+                -p)
                         shift
                         if test $# -gt 0; then
-                                FOREVER=$1
+                                FOREVERPATH=$1
                         else
                                 echo "no forever log location specified"
                                 exit 1
@@ -44,38 +43,10 @@ while test $# -gt 0; do
                         shift
                         ;;
                 --forever*)
-                        export FOREVER=`echo $1 | sed -e 's/^[^=]*=//g'`
+                        export FOREVERPATH=`echo $1 | sed -e 's/^[^=]*=//g'`
                         shift
                         ;;
-                -o)
-                        shift
-                        if test $# -gt 0; then
-                                OUTPUT=$1
-                        else
-                                echo "no output log specified"
-                                exit 1
-                        fi
-                        shift
-                        ;;
-                --output*)
-                        export OUTPUT=`echo $1 | sed -e 's/^[^=]*=//g'`
-                        shift
-                        ;;
-                -e)
-                        shift
-                        if test $# -gt 0; then
-                                ERROR=$1
-                        else
-                                echo "no error specified"
-                                exit 1
-                        fi
-                        shift
-                        ;;
-                --error*)
-                        export ERROR=`echo $1 | sed -e 's/^[^=]*=//g'`
-                        shift
-                        ;;
-
+               
                 *)
                         break
                         ;;
@@ -94,112 +65,10 @@ if [ ! -f "$CONFIG" ]; then
     usage
 fi
 
-DIR=dirname $FOREVER
 
-mkdir -p $DIR
 
-# Use -L to get information about the target of a symlink,
-# not the link itself, as pointed out in the comments
-INFO=( $(stat -cL "%a %G %U" $DIR) )
-PERM=${INFO[0]}
-GROUP=${INFO[1]}
-OWNER=${INFO[2]}
-
-ACCESS=no
-if [[ $PERM & 0002 != 0 ]]; then
-    # Everyone has write access
-    ACCESS=yes
-elif [[ $PERM & 0020 != 0 ]]; then
-    # Some group has write access.
-    # Is user in that group?
-    gs=( $(groups $USER) )
-    for g in "${gs[@]}"; do
-        if [[ $GROUP == $g ]]; then
-            ACCESS=yes
-            break
-        fi
-    done
-elif [[ $PERM & 0200 != 0 ]]; then 
-    # The owner has write access.
-    # Does the user own the file?
-    [[ $USER == $OWNER ]] && ACCESS=yes
-fi
-
-if [ $ACCESS=no ]; then 
-    echo "Cannot write to: $DIR"
-fi
-
-DIR=dirname $OUTPUT
-
-mkdir -p $DIR
-
-# Use -L to get information about the target of a symlink,
-# not the link itself, as pointed out in the comments
-INFO=( $(stat -cL "%a %G %U" $DIR) )
-PERM=${INFO[0]}
-GROUP=${INFO[1]}
-OWNER=${INFO[2]}
-
-ACCESS=no
-if [[ $PERM & 0002 != 0 ]]; then
-    # Everyone has write access
-    ACCESS=yes
-elif [[ $PERM & 0020 != 0 ]]; then
-    # Some group has write access.
-    # Is user in that group?
-    gs=( $(groups $USER) )
-    for g in "${gs[@]}"; do
-        if [[ $GROUP == $g ]]; then
-            ACCESS=yes
-            break
-        fi
-    done
-elif [[ $PERM & 0200 != 0 ]]; then 
-    # The owner has write access.
-    # Does the user own the file?
-    [[ $USER == $OWNER ]] && ACCESS=yes
-fi
-
-if [ $ACCESS=no ]; then 
-    echo "Cannot write to: $DIR"
-fi
-
-DIR=dirname $ERROR
-
-mkdir -p $DIR
-
-# Use -L to get information about the target of a symlink,
-# not the link itself, as pointed out in the comments
-INFO=( $(stat -cL "%a %G %U" $DIR) )
-PERM=${INFO[0]}
-GROUP=${INFO[1]}
-OWNER=${INFO[2]}
-
-ACCESS=no
-if [[ $PERM & 0002 != 0 ]]; then
-    # Everyone has write access
-    ACCESS=yes
-elif [[ $PERM & 0020 != 0 ]]; then
-    # Some group has write access.
-    # Is user in that group?
-    gs=( $(groups $USER) )
-    for g in "${gs[@]}"; do
-        if [[ $GROUP == $g ]]; then
-            ACCESS=yes
-            break
-        fi
-    done
-elif [[ $PERM & 0200 != 0 ]]; then 
-    # The owner has write access.
-    # Does the user own the file?
-    [[ $USER == $OWNER ]] && ACCESS=yes
-fi
-
-if [ $ACCESS=no ]; then 
-    echo "Cannot write to: $DIR"
-fi
 
 
 mydir=`dirname $0`
 PATH=$PATH:$mydir/../node_modules/.bin:
-$mydir/../node_modules/.bin/forever start -a -l $FOREVER -o $OUTPUT -e $ERROR $mydir/../index.js $CONFIG
+$mydir/../node_modules/.bin/forever start -a -p $FOREVERPATH --minUptime 1000  --spinSleepTime 1000 $mydir/../index.js $CONFIG
