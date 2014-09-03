@@ -1,6 +1,9 @@
 #!/bin/bash
 
-FOREVERPATH="./var"
+mydir=`dirname $0`
+PATH=$PATH:$mydir/../node_modules/.bin:
+
+FOREVERPATH=$mydir"/../var"
 
 
 usage() { echo "Usage: $0 [-c <string>] [-p <./var>] " 1>&2; exit 1; }
@@ -65,10 +68,4 @@ if [ ! -f "$CONFIG" ]; then
     usage
 fi
 
-
-
-
-
-mydir=`dirname $0`
-PATH=$PATH:$mydir/../node_modules/.bin:
 $mydir/../node_modules/.bin/forever start -a -p $FOREVERPATH --minUptime 1000  --spinSleepTime 1000 $mydir/../index.js $CONFIG
