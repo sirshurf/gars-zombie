@@ -25,31 +25,36 @@ $ npm install
 
 # Configuration
 ```
-    {
-      "google": {
-        "email": "<your email>",
-          "password": "<your password>",
-          "analytics": {
-            "home_id": "<your google analytics home id>",
-            "report_id": "<your google analytics project id>"
-          }
-      },
-      "casperjs": {
-        "verbose": true,
-        "logLevel": "info"
-      },
-      "metric": {
-        "name": "google.analytics.visitors",
-        "tags": [ "tag1", "tag2" ],
-        "hostname": "<your hostname>"
-      },
-      "backend": {
-          "datadog": {
-            "api_key": "<your datadog api key",
-            "url": "https://app.datadoghq.com/api/v1/series"
-          }
-        }
-    }
+{
+	"scraper":   [{
+			"google": {
+				"email": "<your email>",
+				"password": "<your password>"
+			},
+			"report": [{
+				"analytics": {
+					"home_id": "<your google analytics home id>",
+					"report_id": "<your google analytics project id>"
+				},
+				"metric": {
+					"backend":"datadog",
+					"name": "google.analytics.visitors",
+					"tags": [ "tag1", "tag2" ],
+					"hostname": "<your hostname>"
+				}
+
+			}]
+	}],
+
+	"backend": {
+		"datadog": {
+			"type": "datadog",
+			"api_key": "<your datadog api key",
+			"url": "https://app.datadoghq.com/api/v1/series"
+		}
+	}
+
+}
 ```
 
 # Running it
@@ -60,7 +65,7 @@ $ npm install
 `$ gars-zombie -c <config file>`
 
 ## From npm local
-`$ ./node_modules/gars/bin/gars-zombie -c <config file>`
+`$ ./node_modules/gars-zombie/bin/gars-zombie -c <config file>`
 
 # Finding the ids
 Once logged into the analytics. Note the following ids:

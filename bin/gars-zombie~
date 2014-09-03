@@ -94,6 +94,112 @@ if [ ! -f "$CONFIG" ]; then
     usage
 fi
 
+DIR=dirname $FOREVER
+
+mkdir -p $DIR
+
+# Use -L to get information about the target of a symlink,
+# not the link itself, as pointed out in the comments
+INFO=( $(stat -cL "%a %G %U" $DIR) )
+PERM=${INFO[0]}
+GROUP=${INFO[1]}
+OWNER=${INFO[2]}
+
+ACCESS=no
+if [[ $PERM & 0002 != 0 ]]; then
+    # Everyone has write access
+    ACCESS=yes
+elif [[ $PERM & 0020 != 0 ]]; then
+    # Some group has write access.
+    # Is user in that group?
+    gs=( $(groups $USER) )
+    for g in "${gs[@]}"; do
+        if [[ $GROUP == $g ]]; then
+            ACCESS=yes
+            break
+        fi
+    done
+elif [[ $PERM & 0200 != 0 ]]; then 
+    # The owner has write access.
+    # Does the user own the file?
+    [[ $USER == $OWNER ]] && ACCESS=yes
+fi
+
+if [ $ACCESS=no ]; then 
+    echo "Cannot write to: $DIR"
+fi
+
+DIR=dirname $OUTPUT
+
+mkdir -p $DIR
+
+# Use -L to get information about the target of a symlink,
+# not the link itself, as pointed out in the comments
+INFO=( $(stat -cL "%a %G %U" $DIR) )
+PERM=${INFO[0]}
+GROUP=${INFO[1]}
+OWNER=${INFO[2]}
+
+ACCESS=no
+if [[ $PERM & 0002 != 0 ]]; then
+    # Everyone has write access
+    ACCESS=yes
+elif [[ $PERM & 0020 != 0 ]]; then
+    # Some group has write access.
+    # Is user in that group?
+    gs=( $(groups $USER) )
+    for g in "${gs[@]}"; do
+        if [[ $GROUP == $g ]]; then
+            ACCESS=yes
+            break
+        fi
+    done
+elif [[ $PERM & 0200 != 0 ]]; then 
+    # The owner has write access.
+    # Does the user own the file?
+    [[ $USER == $OWNER ]] && ACCESS=yes
+fi
+
+if [ $ACCESS=no ]; then 
+    echo "Cannot write to: $DIR"
+fi
+
+DIR=dirname $ERROR
+
+mkdir -p $DIR
+
+# Use -L to get information about the target of a symlink,
+# not the link itself, as pointed out in the comments
+INFO=( $(stat -cL "%a %G %U" $DIR) )
+PERM=${INFO[0]}
+GROUP=${INFO[1]}
+OWNER=${INFO[2]}
+
+ACCESS=no
+if [[ $PERM & 0002 != 0 ]]; then
+    # Everyone has write access
+    ACCESS=yes
+elif [[ $PERM & 0020 != 0 ]]; then
+    # Some group has write access.
+    # Is user in that group?
+    gs=( $(groups $USER) )
+    for g in "${gs[@]}"; do
+        if [[ $GROUP == $g ]]; then
+            ACCESS=yes
+            break
+        fi
+    done
+elif [[ $PERM & 0200 != 0 ]]; then 
+    # The owner has write access.
+    # Does the user own the file?
+    [[ $USER == $OWNER ]] && ACCESS=yes
+fi
+
+if [ $ACCESS=no ]; then 
+    echo "Cannot write to: $DIR"
+fi
+
+
 mydir=`dirname $0`
 PATH=$PATH:$mydir/../node_modules/.bin:
-echo $mydir/../node_modules/.bin/forever start -l $FOREVER -o $OUTPUT -e $ERROR $mydir/../index.js $CONFIG
+$mydir/../node_modules/.bin/forever start -l $FOREVER -o $OUTPUT -e $ERROR $mydir/../index.js $CONFIG
