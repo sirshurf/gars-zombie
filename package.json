@@ -1,6 +1,6 @@
 {
   "name": "gars-zombie",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "scrapes google Realtime information and pushes it to your metrics system. (using ZombieJS)",
   "main": "index.js",
   "dependencies": {
