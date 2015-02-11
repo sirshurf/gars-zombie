@@ -65,14 +65,18 @@ var browserVisit = function (browser, configLine) {
 		var analyticsHomeId = reportLine.analytics.home_id;
 		var analyticsReportId = reportLine.analytics.report_id;
 
-		browser.visit("https://www.google.com/analytics/realtime/getData?key="+analyticsHomeId+"&ds="+analyticsReportId+"&pageId=RealtimeReport%2Frt-overview&q=t%3A0|%3A1|%3A0%3A%2C&f", function(e) {
+		browser.visit("https://www.google.com/analytics/realtime/getData?key="+analyticsHomeId+"&ds="+analyticsReportId+"&pageId=RealtimeReport%2Frt-overview&q=t%3A0%7C%3A1%7C%3A0%3A%2Ct%3A10%7C%3A1%7C%3A0%3A10%3D%3D%2Fthank_you%2F%2Ct%3A10%7C%3A1%7C%3A0%3A10%3D%3D%2F", function(e) {
 			var StrippedString = browser.html('body').replace(/(<([^>]+)>)/ig,"");
 			var JsonParsed = JSON.parse(StrippedString);
+			// console.log("The page:", JsonParsed );
 			var TotalMEtrics = JsonParsed["t:0|:1|:0:"]["metricTotals"][0];
-
-			//console.log("The page:", TotalMEtrics );
+			var TotalMEtricsSlash = JsonParsed["t:10|:1|:0:10==/"]["metricTotals"][0];
+			var TotalMEtricsThankYou = JsonParsed["t:10|:1|:0:10==/thank_you/"]["metricTotals"][0];
+			var ratio = parseInt(parseInt(TotalMEtricsThankYou)/parseInt(TotalMEtricsSlash)*100);
+			console.log("The page:", ratio );
 
 			backend( reportLine.metric, TotalMEtrics);
+			backend( reportLine.ratio, ratio);
 
 			// Infinite loop
 			setTimeout(function () {
