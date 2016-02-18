@@ -91,7 +91,8 @@ var browserVisit = function (browser, configLine) {
 /*
  * Read configuration file
  */
-var args = require('system').args;
+var args = process.argv;
+console.log(process.argv);
 var configFile = args[2];
 var config = require(configFile);
 
