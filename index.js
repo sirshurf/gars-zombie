@@ -95,7 +95,7 @@ var args = process.argv;
 console.log(process.argv);
 var configFile = args[2];
 var config = require(configFile);
-
+/*
 config.scraper.forEach(function(configLine) {
 
 	var googleEmail = configLine.google.email;
@@ -115,6 +115,33 @@ config.scraper.forEach(function(configLine) {
 	});
 
 });
+*/
+
+
+config.scraper.forEach(function(configLine) {
+
+	var googleEmail = configLine.google.email;
+	var googlePassword = configLine.google.password;
+	// Make Login
+	browser = new Browser();
+	browser.visit("https://accounts.google.com/ServiceLogin?service=analytics&passive=true&nui=1&hl=en&continue=https%3A%2F%2Fwww.google.com%2Fanalytics%2Fweb%2F%3Fhl%3Den&followup=https%3A%2F%2Fwww.google.com%2Fanalytics%2Fweb%2F%3Fhl%3Den", function () {
+		console.log('First Page');
+		// Fill email, password and submit form
+		browser.
+			fill("Email", googleEmail).
+			pressButton("#next", function() {
+
+				browser.fill("Passwd", googlePassword).
+				pressButton("#signIn", function() {
+							console.log(browser.text("title"));
+					browserVisit(browser, configLine);
+
+				});
+			});
+	});
+
+});
+
 
 
 
